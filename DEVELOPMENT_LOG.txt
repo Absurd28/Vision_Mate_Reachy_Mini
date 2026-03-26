@@ -1,0 +1,50 @@
+# VisionMate AI - Development Progress Report
+# Date: Thursday, March 26, 2026
+# Project: Reachy Mini Assistive Robotics Simulation
+
+## 1. COMPLETED TASKS & MILESTONES
+- **Modular System Architecture**: Successfully refactored the monolithic simulation into a 5-module system:
+    - `main.py`: The Orchestrator (manages threads and lifecycle).
+    - `ui.py`: CustomTkinter Dashboard (Dark mode, HighDPI video feed).
+    - `robot.py`: MuJoCo Physics Brain (IK, Trajectories, State Machine).
+    - `voice.py`: Speech Recognition Engine (Correction-aware listener).
+    - `nlp_inference.py`: DistilBERT Intent Classifier (CPU-optimized).
+- **NLP Pipeline Implementation**:
+    - Built a synthetic data generator (`generate_data.py`) to bypass Kaggle API restrictions.
+    - Successfully trained a custom DistilBERT model for robotic intents: `fetch_object`, `stop_robot`, `move_arm`, `greet_user`.
+    - Integrated inference into the main voice-command loop.
+- **Physics Stabilization**:
+    - Implemented a **Surgical Actuator Sync** loop to prevent control array mismatches.
+    - Added a **100-step Physics Warm-up** to settle collision meshes silently.
+    - Implemented **Cubic Smoothstep (Smoothstep) Trajectories** to eliminate violent vibrations during movement.
+    - Dynamically adjusted the robot spawn height to **Z=0.8** to prevent initial table-clipping explosions.
+- **Voice Resiliency**:
+    - Developed a `PHONETIC_MAP` to correct common STT errors (e.g., "gulab ka botal" -> "grab the bottle").
+- **UI Optimization**:
+    - Migrated from `ImageTk` to `ctk.CTkImage` to support modern display scaling and remove console warnings.
+
+## 2. KEY ISSUES RESOLVED
+- **IndexError: Index 9 out of bounds**: Resolved by dynamically mapping Actuator IDs using `mujoco.mj_name2id` instead of assuming joint-index parity.
+- **NaN/Inf Physics Explosions**: Resolved via a combination of micro-timestepping (0.001s), PGS solver tuning, and a 1-second "soft-start" initialization delay.
+- **DPI Scaling Warnings**: Resolved by implementing proper `customtkinter` image objects.
+- **Kaggle 403 Errors**: Bypassed using a local high-quality synthetic dataset tailored for Reachy's specific workspace.
+
+## 3. CURRENT SYSTEM STATE
+- The system launches a background Voice Listener and a MuJoCo 3D Viewer simultaneously.
+- When a command is heard, it is cleaned phonetically, classified by AI, and sent to a thread-safe queue.
+- The Robot Brain pulls from this queue and executes multi-step task sequences (e.g., the 9-step `fetch_bottle` sequence).
+
+## 4. UPCOMING TASKS (FOR TOMORROW)
+- **Vision Integration (The Vision Bridge)**:
+    - Implement the cursor-tracking placeholder in `vision.py`.
+    - Map 2D screen coordinates from the webcam feed into the 3D MuJoCo table coordinates.
+- **Grasping Refinement**:
+    - Fine-tune the collision parameters of the "bottle" object to ensure it doesn't slip out of the gripper.
+    - Add a "Retreat" sequence after the handover task is finished.
+- **Head-Tracking**:
+    - Implement "Active Gaze": make the robot's head joints track the "user_hand_loc" during sequences.
+- **Performance Profiling**:
+    - Monitor CPU usage during concurrent NLP inference and 1000Hz physics stepping.
+
+---
+End of Report.

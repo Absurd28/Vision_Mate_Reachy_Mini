@@ -1,0 +1,101 @@
+<mujoco model="reachy_mini_scene">
+    <compiler angle="degree" coordinate="local" inertiafromgeom="true"/>
+    <option integrator="RK4" timestep="0.01"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>
+        <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 .2 .3" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>
+        <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
+    </asset>
+
+    <worldbody>
+        <light directional="true" diffuse=".8 .8 .8" specular=".2 .2 .2" pos="0 0 5" dir="0 0 -1"/>
+        <geom name="floor" pos="0 0 0" size="0 0 .25" type="plane" material="matplane" condim="3"/>
+
+        <!-- Table -->
+        <body name="table" pos="0.4 0 0.4">
+            <geom name="table_top" type="box" size="0.3 0.5 0.02" rgba="0.6 0.4 0.2 1"/>
+            <geom name="table_leg1" type="cylinder" size="0.02 0.2" pos="0.25 0.45 -0.2" rgba="0.6 0.4 0.2 1"/>
+            <geom name="table_leg2" type="cylinder" size="0.02 0.2" pos="-0.25 0.45 -0.2" rgba="0.6 0.4 0.2 1"/>
+            <geom name="table_leg3" type="cylinder" size="0.02 0.2" pos="0.25 -0.45 -0.2" rgba="0.6 0.4 0.2 1"/>
+            <geom name="table_leg4" type="cylinder" size="0.02 0.2" pos="-0.25 -0.45 -0.2" rgba="0.6 0.4 0.2 1"/>
+        </body>
+
+        <!-- Target Object (Medicine Bottle) -->
+        <body name="target" pos="0.4 0 0.45">
+            <joint name="target_free" type="free"/>
+            <geom name="bottle" type="cylinder" size="0.02 0.04" rgba="1 0 0 1" mass="0.1" condim="4" friction="1 0.5 0.01"/>
+        </body>
+
+        <!-- Reachy Mini Right Arm (Simplified Model) -->
+        <body name="reachy_base" pos="0 0 0.5">
+            <geom name="base_geom" type="cylinder" size="0.05 0.05" rgba="0.8 0.8 0.8 1"/>
+            
+            <body name="r_shoulder" pos="0 -0.1 0">
+                <joint name="r_shoulder_pitch" type="hinge" axis="0 1 0" range="-180 180"/>
+                <geom name="shoulder_pitch_geom" type="sphere" size="0.04" rgba="0.9 0.9 0.9 1"/>
+                
+                <body name="r_shoulder_roll_link" pos="0 0 0">
+                    <joint name="r_shoulder_roll" type="hinge" axis="1 0 0" range="-180 180"/>
+                    <!-- Added geom to provide mass/inertia -->
+                    <geom name="shoulder_roll_geom" type="sphere" size="0.035" rgba="0.9 0.9 0.9 1"/>
+                    
+                    <body name="r_arm_yaw_link" pos="0 0 -0.1">
+                        <joint name="r_arm_yaw" type="hinge" axis="0 0 1" range="-180 180"/>
+                        <geom name="upper_arm" type="capsule" fromto="0 0 0 0 0 -0.15" size="0.03" rgba="0.9 0.9 0.9 1"/>
+                        
+                        <body name="r_elbow" pos="0 0 -0.15">
+                            <joint name="r_elbow_pitch" type="hinge" axis="0 1 0" range="-180 180"/>
+                            <geom name="elbow_geom" type="sphere" size="0.03" rgba="0.9 0.9 0.9 1"/>
+                            
+                            <body name="r_forearm" pos="0 0 0">
+                                <joint name="r_forearm_yaw" type="hinge" axis="0 0 1" range="-180 180"/>
+                                <geom name="forearm_geom" type="capsule" fromto="0 0 0 0 0 -0.15" size="0.025" rgba="0.9 0.9 0.9 1"/>
+                                
+                                <body name="r_wrist" pos="0 0 -0.15">
+                                    <joint name="r_wrist_pitch" type="hinge" axis="0 1 0" range="-180 180"/>
+                                    <!-- Added geom to provide mass/inertia -->
+                                    <geom name="wrist_pitch_geom" type="sphere" size="0.02" rgba="0.9 0.9 0.9 1"/>
+                                    
+                                    <body name="r_wrist_roll_link">
+                                        <joint name="r_wrist_roll" type="hinge" axis="1 0 0" range="-180 180"/>
+                                        <!-- Added geom to provide mass/inertia -->
+                                        <geom name="wrist_roll_geom" type="sphere" size="0.018" rgba="0.9 0.9 0.9 1"/>
+                                        
+                                        <!-- End Effector Site -->
+                                        <site name="r_end_effector" pos="0 0 -0.05" size="0.01" rgba="0 1 0 1"/>
+                                        
+                                        <!-- Simple Gripper -->
+                                        <body name="r_gripper" pos="0 0 -0.05">
+                                            <geom name="palm" type="box" size="0.02 0.03 0.01" rgba="0.5 0.5 0.5 1"/>
+                                            <body name="left_finger" pos="0 0.025 -0.02">
+                                                <joint name="r_gripper_left" type="slide" axis="0 -1 0" range="0 0.02"/>
+                                                <geom type="box" size="0.01 0.005 0.02" rgba="0.3 0.3 0.3 1" mass="0.01"/>
+                                            </body>
+                                            <body name="right_finger" pos="0 -0.025 -0.02">
+                                                <joint name="r_gripper_right" type="slide" axis="0 1 0" range="0 0.02"/>
+                                                <geom type="box" size="0.01 0.005 0.02" rgba="0.3 0.3 0.3 1" mass="0.01"/>
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <position name="a_r_shoulder_pitch" joint="r_shoulder_pitch" kp="100"/>
+        <position name="a_r_shoulder_roll" joint="r_shoulder_roll" kp="100"/>
+        <position name="a_r_arm_yaw" joint="r_arm_yaw" kp="100"/>
+        <position name="a_r_elbow_pitch" joint="r_elbow_pitch" kp="100"/>
+        <position name="a_r_forearm_yaw" joint="r_forearm_yaw" kp="100"/>
+        <position name="a_r_wrist_pitch" joint="r_wrist_pitch" kp="100"/>
+        <position name="a_r_wrist_roll" joint="r_wrist_roll" kp="100"/>
+        <position name="a_r_gripper_left" joint="r_gripper_left" kp="50"/>
+        <position name="a_r_gripper_right" joint="r_gripper_right" kp="50"/>
+    </actuator>
+</mujoco>

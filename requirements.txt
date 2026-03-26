@@ -1,0 +1,14 @@
+mujoco
+mujoco-python-viewer
+numpy
+customtkinter
+opencv-python
+Pillow
+SpeechRecognition
+PyAudio
+transformers
+torch
+tqdm
+pandas
+scikit-learn
+reachy-mini

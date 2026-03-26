@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+venv/
+env/
+
+# ML Models & Data (Bulky)
+reachy_nlp_model/
+data/
+train_data.csv
+val_data.csv
+label_mapping.json
+
+# MuJoCo Temp
+MJDATA.TXT
+MJMODEL.TXT
+MUJOCO_LOG.TXT
+*.mjb
+
+# Secrets (CRITICAL)
+kaggle.json
+
+# OS
+.DS_Store
+Thumbs.db
